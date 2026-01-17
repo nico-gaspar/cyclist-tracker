@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import {
@@ -159,7 +159,7 @@ function categoryForRace(entry) {
   return entry.result || null;
 }
 
-export default function CalendarPage() {
+function CalendarContent() {
   const searchParams = useSearchParams();
   const [riders, setRiders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -385,5 +385,13 @@ export default function CalendarPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function CalendarPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CalendarContent />
+    </Suspense>
   );
 }
