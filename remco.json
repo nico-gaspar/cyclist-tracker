@@ -1,0 +1,83 @@
+{
+  "rider": {
+    "name": "Remco  Evenepoel",
+    "team": "Red Bull - BORA",
+    "photoUrl": "https://www.procyclingstats.com/images/riders/gu/em/remco-evenepoel-2026.jpg"
+  },
+  "calendar": [
+    {
+      "date": "2026-01-28",
+      "raceName": "Trofeo Calvià",
+      "raceLink": "https://www.procyclingstats.com/race/trofeo-calvia/2026",
+      "result": "1.1"
+    },
+    {
+      "date": "2026-01-29",
+      "raceName": "Trofeo Ses Salines",
+      "raceLink": "https://www.procyclingstats.com/race/trofeo-ses-salines-felanitx/2026",
+      "result": "1.1"
+    },
+    {
+      "date": "2026-01-30",
+      "raceName": "Trofeo Serra Tramuntana",
+      "raceLink": "https://www.procyclingstats.com/race/deia-trophy/2026",
+      "result": "1.1"
+    },
+    {
+      "date": "2026-01-31",
+      "raceName": "Trofeo Andratx - Pollença",
+      "raceLink": "https://www.procyclingstats.com/race/trofeo-pollenca-port-d-andratx/2026",
+      "result": "1.1"
+    },
+    {
+      "date": "2026-02-01",
+      "raceName": "Trofeo Palma",
+      "raceLink": "https://www.procyclingstats.com/race/trofeo-palma/2026",
+      "result": "1.1"
+    },
+    {
+      "date": "2026-02-04",
+      "raceName": "Volta Comunitat Valenciana",
+      "raceLink": "https://www.procyclingstats.com/race/vuelta-a-la-comunidad-valenciana/2026",
+      "result": "2.Pro"
+    },
+    {
+      "date": "2026-03-23",
+      "raceName": "Volta Ciclista a Catalunya",
+      "raceLink": "https://www.procyclingstats.com/race/volta-a-catalunya/2026",
+      "result": "2.UWT"
+    },
+    {
+      "date": "2026-04-19",
+      "raceName": "Amstel Gold Race",
+      "raceLink": "https://www.procyclingstats.com/race/amstel-gold-race/2026",
+      "result": "1.UWT"
+    },
+    {
+      "date": "2026-04-22",
+      "raceName": "La Flèche Wallonne",
+      "raceLink": "https://www.procyclingstats.com/race/la-fleche-wallonne/2026",
+      "result": "1.UWT"
+    },
+    {
+      "date": "2026-04-26",
+      "raceName": "Liège-Bastogne-Liège",
+      "raceLink": "https://www.procyclingstats.com/race/liege-bastogne-liege/2026",
+      "result": "1.UWT"
+    },
+    {
+      "date": "2026-06-07",
+      "raceName": "Tour Auvergne - Rhône-Alpes",
+      "raceLink": "https://www.procyclingstats.com/race/dauphine/2026",
+      "result": "2.UWT"
+    },
+    {
+      "date": "2026-07-04",
+      "raceName": "Tour de France",
+      "raceLink": "https://www.procyclingstats.com/race/tour-de-france/2026",
+      "result": "2.UWT"
+    }
+  ],
+  "scrapedAt": "2026-01-16T19:50:52.824Z",
+  "source": "procyclingstats"
+}

@@ -1,0 +1,59 @@
+{
+  "rider": {
+    "name": "Tadej  Pogačar",
+    "team": "UAE Team Emirates",
+    "photoUrl": "https://www.procyclingstats.com/images/riders/oh/em/tadej-pogacar-2026.jpg"
+  },
+  "calendar": [
+    {
+      "date": "2026-03-07",
+      "raceName": "Strade Bianche",
+      "raceLink": "https://www.procyclingstats.com/race/strade-bianche/2026",
+      "result": "1.UWT"
+    },
+    {
+      "date": "2026-03-21",
+      "raceName": "Milano-Sanremo",
+      "raceLink": "https://www.procyclingstats.com/race/milano-sanremo/2026",
+      "result": "1.UWT"
+    },
+    {
+      "date": "2026-04-05",
+      "raceName": "Ronde van Vlaanderen",
+      "raceLink": "https://www.procyclingstats.com/race/ronde-van-vlaanderen/2026",
+      "result": "1.UWT"
+    },
+    {
+      "date": "2026-04-12",
+      "raceName": "Paris-Roubaix",
+      "raceLink": "https://www.procyclingstats.com/race/paris-roubaix/2026",
+      "result": "1.UWT"
+    },
+    {
+      "date": "2026-04-26",
+      "raceName": "Liège-Bastogne-Liège",
+      "raceLink": "https://www.procyclingstats.com/race/liege-bastogne-liege/2026",
+      "result": "1.UWT"
+    },
+    {
+      "date": "2026-04-28",
+      "raceName": "Tour de Romandie",
+      "raceLink": "https://www.procyclingstats.com/race/tour-de-romandie/2026",
+      "result": "2.UWT"
+    },
+    {
+      "date": "2026-06-17",
+      "raceName": "Tour de Suisse",
+      "raceLink": "https://www.procyclingstats.com/race/tour-de-suisse/2026",
+      "result": "2.UWT"
+    },
+    {
+      "date": "2026-07-04",
+      "raceName": "Tour de France",
+      "raceLink": "https://www.procyclingstats.com/race/tour-de-france/2026",
+      "result": "2.UWT"
+    }
+  ],
+  "scrapedAt": "2026-01-16T19:49:50.432Z",
+  "source": "procyclingstats"
+}

@@ -1,0 +1,35 @@
+{
+  "rider": {
+    "name": "Adam  Yates",
+    "team": "UAE Team Emirates",
+    "photoUrl": "https://www.procyclingstats.com/images/riders/oh/em/adam-yates-2026.jpg"
+  },
+  "calendar": [
+    {
+      "date": "2026-01-20",
+      "raceName": "Santos Tour Down Under",
+      "raceLink": "https://www.procyclingstats.com/race/tour-down-under/2026",
+      "result": "2.UWT"
+    },
+    {
+      "date": "2026-02-07",
+      "raceName": "Tour of Oman",
+      "raceLink": "https://www.procyclingstats.com/race/tour-of-oman/2026",
+      "result": "2.Pro"
+    },
+    {
+      "date": "2026-05-08",
+      "raceName": "Giro d'Italia",
+      "raceLink": "https://www.procyclingstats.com/race/giro-d-italia/2026",
+      "result": "2.UWT"
+    },
+    {
+      "date": "2026-07-04",
+      "raceName": "Tour de France",
+      "raceLink": "https://www.procyclingstats.com/race/tour-de-france/2026",
+      "result": "2.UWT"
+    }
+  ],
+  "scrapedAt": "2026-01-16T19:51:13.400Z",
+  "source": "procyclingstats"
+}

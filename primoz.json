@@ -1,0 +1,35 @@
+{
+  "rider": {
+    "name": "Primož  Roglič",
+    "team": "Red Bull - BORA",
+    "photoUrl": "https://www.procyclingstats.com/images/riders/gu/em/primoz-roglic-2026.jpg"
+  },
+  "calendar": [
+    {
+      "date": "2026-03-09",
+      "raceName": "Tirreno-Adriatico",
+      "raceLink": "https://www.procyclingstats.com/race/tirreno-adriatico/2026",
+      "result": "2.UWT"
+    },
+    {
+      "date": "2026-04-06",
+      "raceName": "Itzulia Basque Country",
+      "raceLink": "https://www.procyclingstats.com/race/itzulia-basque-country/2026",
+      "result": "2.UWT"
+    },
+    {
+      "date": "2026-04-28",
+      "raceName": "Tour de Romandie",
+      "raceLink": "https://www.procyclingstats.com/race/tour-de-romandie/2026",
+      "result": "2.UWT"
+    },
+    {
+      "date": "2026-08-22",
+      "raceName": "La Vuelta Ciclista a España",
+      "raceLink": "https://www.procyclingstats.com/race/vuelta-a-espana/2026",
+      "result": "2.UWT"
+    }
+  ],
+  "scrapedAt": "2026-01-16T19:50:57.274Z",
+  "source": "procyclingstats"
+}

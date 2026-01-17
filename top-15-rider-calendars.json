@@ -1,0 +1,67 @@
+{
+  "scrapedAt": "2026-01-16T04:21:34.244Z",
+  "source": "procyclingstats",
+  "results": [],
+  "errors": [
+    {
+      "rider": "tadej-pogacar",
+      "error": "Request failed with status code 403"
+    },
+    {
+      "rider": "jonas-vingegaard",
+      "error": "Request failed with status code 403"
+    },
+    {
+      "rider": "isaac-del-toro",
+      "error": "Request failed with status code 403"
+    },
+    {
+      "rider": "mads-pedersen",
+      "error": "Request failed with status code 403"
+    },
+    {
+      "rider": "joao-almeida",
+      "error": "Request failed with status code 403"
+    },
+    {
+      "rider": "remco-evenepoel",
+      "error": "Request failed with status code 403"
+    },
+    {
+      "rider": "tom-pidcock",
+      "error": "Request failed with status code 403"
+    },
+    {
+      "rider": "mathieu-van-der-poel",
+      "error": "Request failed with status code 403"
+    },
+    {
+      "rider": "oscar-onley",
+      "error": "Request failed with status code 403"
+    },
+    {
+      "rider": "wout-van-aert",
+      "error": "Request failed with status code 403"
+    },
+    {
+      "rider": "arnaud-de-lie",
+      "error": "Request failed with status code 403"
+    },
+    {
+      "rider": "giulio-ciccone",
+      "error": "Request failed with status code 403"
+    },
+    {
+      "rider": "ben-healy",
+      "error": "Request failed with status code 403"
+    },
+    {
+      "rider": "juan-ayuso",
+      "error": "Request failed with status code 403"
+    },
+    {
+      "rider": "florian-lipowitz",
+      "error": "Request failed with status code 403"
+    }
+  ]
+}

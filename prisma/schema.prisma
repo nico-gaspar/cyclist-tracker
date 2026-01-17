@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Rider {
+  id              String          @id @default(cuid())
+  slug            String          @unique
+  name            String
+  team            String?
+  photoUrl        String?
+  calendarEntries CalendarEntry[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model CalendarEntry {
+  id        String   @id @default(cuid())
+  riderId   String
+  date      DateTime
+  raceName  String
+  raceLink  String?
+  result    String?
+  rider     Rider    @relation(fields: [riderId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([riderId, date, raceName])
+  @@index([date])
+}

@@ -1,0 +1,65 @@
+{
+  "rider": {
+    "name": "Wout van Aert",
+    "team": "Team Visma | Lease a Bike",
+    "photoUrl": "https://www.procyclingstats.com/images/riders/vg/em/wout-van-aert-2026-n2-n3.jpg"
+  },
+  "calendar": [
+    {
+      "date": "2026-02-28",
+      "raceName": "Omloop Nieuwsblad",
+      "raceLink": "https://www.procyclingstats.com/race/omloop-het-nieuwsblad/2026",
+      "result": "1.UWT"
+    },
+    {
+      "date": "2026-03-07",
+      "raceName": "Strade Bianche",
+      "raceLink": "https://www.procyclingstats.com/race/strade-bianche/2026",
+      "result": "1.UWT"
+    },
+    {
+      "date": "2026-03-09",
+      "raceName": "Tirreno-Adriatico",
+      "raceLink": "https://www.procyclingstats.com/race/tirreno-adriatico/2026",
+      "result": "2.UWT"
+    },
+    {
+      "date": "2026-03-21",
+      "raceName": "Milano-Sanremo",
+      "raceLink": "https://www.procyclingstats.com/race/milano-sanremo/2026",
+      "result": "1.UWT"
+    },
+    {
+      "date": "2026-04-05",
+      "raceName": "Ronde van Vlaanderen",
+      "raceLink": "https://www.procyclingstats.com/race/ronde-van-vlaanderen/2026",
+      "result": "1.UWT"
+    },
+    {
+      "date": "2026-04-12",
+      "raceName": "Paris-Roubaix",
+      "raceLink": "https://www.procyclingstats.com/race/paris-roubaix/2026",
+      "result": "1.UWT"
+    },
+    {
+      "date": "2026-06-07",
+      "raceName": "Tour Auvergne - Rhône-Alpes",
+      "raceLink": "https://www.procyclingstats.com/race/dauphine/2026",
+      "result": "2.UWT"
+    },
+    {
+      "date": "2026-07-04",
+      "raceName": "Tour de France",
+      "raceLink": "https://www.procyclingstats.com/race/tour-de-france/2026",
+      "result": "2.UWT"
+    },
+    {
+      "date": "2026-08-22",
+      "raceName": "La Vuelta Ciclista a España",
+      "raceLink": "https://www.procyclingstats.com/race/vuelta-a-espana/2026",
+      "result": "2.UWT"
+    }
+  ],
+  "scrapedAt": "2026-01-16T19:51:05.297Z",
+  "source": "procyclingstats"
+}

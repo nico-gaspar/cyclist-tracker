@@ -1,0 +1,35 @@
+{
+  "rider": {
+    "name": "Jonas  Vingegaard",
+    "team": "Team Visma | Lease a Bike",
+    "photoUrl": "https://www.procyclingstats.com/images/riders/vg/em/jonas-vingegaard-2026-n2-n3.jpg"
+  },
+  "calendar": [
+    {
+      "date": "2026-02-16",
+      "raceName": "UAE Tour",
+      "raceLink": "https://www.procyclingstats.com/race/uae-tour/2026",
+      "result": "2.UWT"
+    },
+    {
+      "date": "2026-03-23",
+      "raceName": "Volta Ciclista a Catalunya",
+      "raceLink": "https://www.procyclingstats.com/race/volta-a-catalunya/2026",
+      "result": "2.UWT"
+    },
+    {
+      "date": "2026-05-08",
+      "raceName": "Giro d'Italia",
+      "raceLink": "https://www.procyclingstats.com/race/giro-d-italia/2026",
+      "result": "2.UWT"
+    },
+    {
+      "date": "2026-07-04",
+      "raceName": "Tour de France",
+      "raceLink": "https://www.procyclingstats.com/race/tour-de-france/2026",
+      "result": "2.UWT"
+    }
+  ],
+  "scrapedAt": "2026-01-16T19:50:48.936Z",
+  "source": "procyclingstats"
+}

@@ -1,0 +1,8 @@
+.next/
+node_modules/
+playwright-browsers/
+npm-cache/
+debug/
+.env
+.env.local
+.DS_Store
