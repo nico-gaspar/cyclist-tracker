@@ -4,7 +4,16 @@ export const dynamic = 'force-dynamic';
 
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import {
+  DndContext,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import {
   Tooltip,
   TooltipContent,
@@ -14,6 +23,7 @@ import {
 
 const YEAR = 2026;
 const DEFAULT_VIEW = 'year';
+const ORDER_STORAGE_KEY = 'calendar-order';
 
 const MONTHS = Array.from({ length: 12 }, (_, index) => {
   const month = index + 1;
@@ -25,6 +35,30 @@ const MONTHS = Array.from({ length: 12 }, (_, index) => {
 });
 
 const BAR_COLOR = '#f6c89a';
+const POPULARITY_ORDER = {
+  'tadej': 1,
+  'tadej-pogacar': 1,
+  'tadej-poga-ar': 1,
+  'jonas-vingegaard': 2,
+  'jonas': 2,
+  'remco-evenepoel': 3,
+  'remco': 3,
+  'primoz-roglic': 4,
+  'primoz': 4,
+  'mathieu-van-der-poel': 5,
+  'mathieu': 5,
+  'wout-van-aert': 6,
+  'wout': 6,
+  'juan-ayuso': 7,
+  'jasper-philipsen': 8,
+  'matteo-jorgenson': 9,
+  'isaac-del-toro': 10,
+  'florian-lipowitz': 11,
+  'giulio-pellizzari': 12,
+  'oscar-onley': 13,
+  'sepp-kuss': 14,
+  'sepp': 14,
+};
 
 function toDateKey(value) {
   return new Date(value).toISOString().slice(0, 10);
@@ -81,6 +115,7 @@ function flagForRace(entry) {
   if (name.includes('tour de france')) return '🇫🇷';
   if (name.includes("giro d'italia")) return '🇮🇹';
   if (name.includes('vuelta a espa')) return '🇪🇸';
+  if (name.includes('volta ciclista a catalunya') || name.includes('volta cataluna')) return '🏴';
   if (name.includes('tour of oman')) return '🇴🇲';
   if (name.includes('uae tour')) return '🇦🇪';
   if (name.includes('tour de suisse')) return '🇨🇭';
@@ -142,6 +177,10 @@ function formatDateRange(startDate, endDate) {
   return `${start} – ${end}`;
 }
 
+function normalizeRaceName(name) {
+  return (name || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
 function categoryForRace(entry) {
   const name = entry.raceName?.toLowerCase() || '';
   if (name.includes('tour de france') || name.includes("giro d'italia") || name.includes('vuelta a espa')) {
@@ -161,14 +200,20 @@ function categoryForRace(entry) {
 
 function CalendarContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [riders, setRiders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [riderOrder, setRiderOrder] = useState([]);
+  const [selectedRaceName, setSelectedRaceName] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
     async function load() {
       setIsLoading(true);
       const response = await fetch('/api/calendar');
+      if (!response.ok) {
+        throw new Error(`Calendar API failed (${response.status})`);
+      }
       const data = await response.json();
       if (isMounted) {
         setRiders(data.riders || []);
@@ -188,12 +233,14 @@ function CalendarContent() {
   }, []);
 
   const requestedMonth = searchParams?.get('month');
+  const teamParam = searchParams?.get('team');
   const normalizedMonth = normalizeMonthParam(requestedMonth);
   const monthKey =
     normalizedMonth === 'year'
       ? 'year'
       : MONTHS.find((month) => month.key === normalizedMonth)?.key;
   const viewKey = monthKey || DEFAULT_VIEW;
+  const selectedTeam = teamParam ? decodeURIComponent(teamParam) : 'all';
 
   const isYearView = viewKey === 'year';
   const dayCount = isYearView ? 12 : daysInMonth(viewKey);
@@ -209,76 +256,303 @@ function CalendarContent() {
   const yearStart = new Date(Date.UTC(YEAR, 0, 1));
   const yearEnd = new Date(Date.UTC(YEAR, 11, 31, 23, 59, 59, 999));
 
-  const filteredRiders = useMemo(() => {
+  const filteredRidersBase = useMemo(() => {
     const rangeStart = isYearView ? yearStart : monthStart;
     const rangeEnd = isYearView ? yearEnd : monthEnd;
-    return riders.map((rider) => ({
-      ...rider,
-      calendarEntries: (rider.calendarEntries || []).filter((entry) => {
-        const date = new Date(entry.date);
-        return date >= rangeStart && date <= rangeEnd;
-      }),
-    }));
-  }, [riders, isYearView, monthStart, monthEnd, yearStart, yearEnd]);
+    return riders
+      .filter((rider) => selectedTeam === 'all' || rider.team === selectedTeam)
+      .map((rider) => ({
+        ...rider,
+        calendarEntries: (rider.calendarEntries || []).filter((entry) => {
+          const date = new Date(entry.date);
+          const entryYear = date.getUTCFullYear();
+          if (entryYear !== YEAR) {
+            return false;
+          }
+          return date >= rangeStart && date <= rangeEnd;
+        }),
+      }));
+  }, [riders, isYearView, monthStart, monthEnd, yearStart, yearEnd, selectedTeam]);
+
+  const defaultOrder = useMemo(() => {
+    const sorted = [...riders].sort((a, b) => {
+      const scoreA = POPULARITY_ORDER[a.slug] ?? Number.POSITIVE_INFINITY;
+      const scoreB = POPULARITY_ORDER[b.slug] ?? Number.POSITIVE_INFINITY;
+      if (scoreA !== scoreB) {
+        return scoreA - scoreB;
+      }
+      return a.name.localeCompare(b.name);
+    });
+    return sorted.map((rider) => rider.id);
+  }, [riders]);
 
   useEffect(() => {
-    if (!isYearView) {
+    if (!riders.length) {
+      setRiderOrder([]);
       return;
     }
-    const debugRaces = [];
-    for (const rider of filteredRiders) {
-      for (const entry of rider.calendarEntries || []) {
-        const isoDate = toDateKey(entry.date);
-        if (
-          entry.raceName?.includes('Tour de France') ||
-          entry.raceName?.includes("Giro d'Italia") ||
-          entry.raceName?.includes('Milano-Sanremo')
-        ) {
-          const monthIndex = Number(isoDate.slice(5, 7));
-          debugRaces.push({
-            race: entry.raceName,
-            date: isoDate,
-            monthIndex,
-            column: monthIndex + 1,
-          });
+
+    let nextOrder = defaultOrder;
+
+    if (typeof window !== 'undefined') {
+      const stored = window.localStorage.getItem(ORDER_STORAGE_KEY);
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            const validIds = new Set(defaultOrder);
+            nextOrder = parsed.filter((id) => validIds.has(id));
+            for (const id of defaultOrder) {
+              if (!nextOrder.includes(id)) {
+                nextOrder.push(id);
+              }
+            }
+          }
+        } catch {
+          nextOrder = defaultOrder;
         }
       }
     }
-    if (debugRaces.length) {
-      // eslint-disable-next-line no-console
-      console.log('Year view race month placement', debugRaces);
-    }
-  }, [filteredRiders, isYearView]);
 
+    setRiderOrder(nextOrder);
+  }, [riders, defaultOrder]);
+
+  const orderedRiders = useMemo(() => {
+    if (!riderOrder.length) {
+      return filteredRidersBase;
+    }
+    const riderMap = new Map(filteredRidersBase.map((rider) => [rider.id, rider]));
+    return riderOrder.map((id) => riderMap.get(id)).filter(Boolean);
+  }, [filteredRidersBase, riderOrder]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 6 },
+    })
+  );
+
+  const teamOptions = useMemo(() => {
+    const uniqueTeams = Array.from(
+      new Set(riders.map((rider) => rider.team).filter(Boolean))
+    );
+    uniqueTeams.sort((a, b) => a.localeCompare(b));
+    return uniqueTeams;
+  }, [riders]);
+
+  const monthParam = viewKey === 'year' ? 'year' : viewKey;
+  const teamQuery = selectedTeam !== 'all' ? `&team=${encodeURIComponent(selectedTeam)}` : '';
+  const withTeamParam = (monthValue) =>
+    `/calendar?month=${monthValue}${teamQuery}`;
+
+  function handleDragEnd(event) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) {
+      return;
+    }
+    const oldIndex = riderOrder.indexOf(active.id);
+    const newIndex = riderOrder.indexOf(over.id);
+    if (oldIndex === -1 || newIndex === -1) {
+      return;
+    }
+    const nextOrder = arrayMove(riderOrder, oldIndex, newIndex);
+    setRiderOrder(nextOrder);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(nextOrder));
+    }
+  }
+
+  function handleResetOrder() {
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem(ORDER_STORAGE_KEY);
+    }
+    setRiderOrder(defaultOrder);
+  }
+
+  function SortableRiderRow({ rider }) {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+      id: rider.id,
+    });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+    };
+
+    const entries = rider.calendarEntries || [];
+    const barColor = BAR_COLOR;
+
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        className={`timeline-row timeline-rider timeline-row-bordered ${
+          isDragging ? 'is-dragging' : ''
+        }`}
+      >
+        <div className="timeline-label timeline-label-sticky">
+          <div className="rider-label">
+            <button
+              type="button"
+              className="drag-handle"
+              aria-label="Reorder rider"
+              {...attributes}
+              {...listeners}
+            >
+              ⋮⋮
+            </button>
+            <div className="avatar small">
+              {rider.photoUrl ? (
+                <img src={rider.photoUrl} alt={rider.name} />
+              ) : (
+                <div className="avatar-fallback">{rider.name?.[0] || '?'}</div>
+              )}
+            </div>
+            <div>
+              <strong>{rider.name}</strong>
+              {rider.team ? <div className="muted">{rider.team}</div> : null}
+            </div>
+          </div>
+        </div>
+
+        {entries.map((entry) => {
+          const isoDate = toDateKey(entry.date);
+          const entryDate = new Date(entry.date);
+          const day = Number(isoDate.slice(8, 10));
+          const durationDays = getDurationDays(entry);
+          const duration = Math.min(durationDays, dayCount - day + 1);
+          const monthIndex = entryDate.getUTCMonth() + 1;
+          const daysInRaceMonth = new Date(Date.UTC(YEAR, monthIndex, 0)).getUTCDate();
+          const yearWidthPercent = Math.min(
+            100,
+            Math.max(10, Math.round((durationDays / daysInRaceMonth) * 100))
+          );
+          const gridColumnStart = isYearView ? monthIndex + 1 : day + 1;
+          const endDate = new Date(entryDate);
+          endDate.setUTCDate(endDate.getUTCDate() + Math.max(0, durationDays - 1));
+          const category = categoryForRace(entry);
+
+          const normalizedRaceName = normalizeRaceName(entry.raceName);
+          const isHighlighted = selectedRaceName === normalizedRaceName;
+          return (
+            <TooltipProvider key={entry.id} delayDuration={150}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className={`race-bar ${isHighlighted ? 'race-bar-highlight' : ''}`}
+                    style={{
+                      gridColumn: `${gridColumnStart} / span ${isYearView ? 1 : duration}`,
+                      gridRow: '1',
+                      width: isYearView
+                        ? `calc(var(--col-width) * ${yearWidthPercent / 100})`
+                        : 'auto',
+                    }}
+                    onClick={() => {
+                      setSelectedRaceName((prev) =>
+                        prev === normalizedRaceName ? null : normalizedRaceName
+                      );
+                    }}
+                    onDoubleClick={(event) => {
+                      if (!isYearView) {
+                        return;
+                      }
+                      event.preventDefault();
+                      event.stopPropagation();
+                      const monthValue = isoDate.slice(0, 7);
+                      const nextTeamParam =
+                        selectedTeam === 'all'
+                          ? ''
+                          : `&team=${encodeURIComponent(selectedTeam)}`;
+                      router.push(`/calendar?month=${monthValue}${nextTeamParam}`);
+                    }}
+                  >
+                    <span className="race-flag">{flagForRace(entry)}</span>
+                    <span className="race-name">{entry.raceName}</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="top" align="center" className="race-tooltip">
+                  <div className="race-title">{entry.raceName}</div>
+                  <div className="race-subtitle">{countryForRace(entry)}</div>
+                  <div className="race-detail">
+                    {formatDateRange(entryDate, endDate)}
+                  </div>
+                  <div className="race-detail">
+                    {durationDays} {durationDays === 1 ? 'day' : 'days'}
+                  </div>
+                  {category ? (
+                    <div className="race-detail">Type: {category}</div>
+                  ) : null}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          );
+        })}
+      </div>
+    );
+  }
 
   return (
-    <main className="container timeline-page">
-      <header className="calendar-header">
-        <h2>{isYearView ? `${YEAR} Overview` : formatMonthLabel(viewKey)}</h2>
+    <main className="container timeline-page calendar-shell">
+      <div className="calendar-top">
         <div className="month-tabs">
+        <Link
+          href={withTeamParam('year')}
+          className={`year-tab ${isYearView ? 'active' : ''}`}
+        >
+          Year
+        </Link>
+        {MONTHS.map((month) => (
           <Link
-            href="/calendar?month=year"
-            className={isYearView ? 'active year-tab' : 'year-tab'}
+            key={month.key}
+            href={withTeamParam(month.key)}
+            className={viewKey === month.key ? 'active' : ''}
           >
-            {YEAR}
+            {month.label}
           </Link>
-          {MONTHS.map((month) => (
-            <Link
-              key={month.key}
-              href={`/calendar?month=${month.key}`}
-              className={month.key === viewKey ? 'active' : undefined}
-            >
-              {month.label}
-            </Link>
-          ))}
+        ))}
+        </div>
+      </div>
+
+      <header className="calendar-header">
+        <div>
+          <h2>{isYearView ? `${YEAR} Overview` : formatMonthLabel(viewKey)}</h2>
+        </div>
+        <div className="calendar-filter">
+          <label className="muted" htmlFor="team-filter">
+            Team
+          </label>
+          <select
+            id="team-filter"
+            value={selectedTeam}
+            onChange={(event) => {
+              const nextTeam = event.target.value;
+              const nextTeamParam =
+                nextTeam === 'all' ? '' : `&team=${encodeURIComponent(nextTeam)}`;
+              router.push(`/calendar?month=${monthParam}${nextTeamParam}`);
+            }}
+          >
+            <option value="all">All teams</option>
+            {teamOptions.map((team) => (
+              <option key={team} value={team}>
+                {team}
+              </option>
+            ))}
+          </select>
+          <button type="button" className="reset-order" onClick={handleResetOrder}>
+            Reset order
+          </button>
         </div>
       </header>
 
       <section className="timeline-section">
         {isLoading ? <p className="muted">Loading calendar...</p> : null}
+        {!isLoading && orderedRiders.length === 0 ? (
+          <p className="muted">
+            No riders found. Check your database connection and seed data.
+          </p>
+        ) : null}
         <div className="timeline-wrapper">
           <div
-            className="timeline-grid"
+            className={`timeline-grid ${isYearView ? 'year-view' : ''}`}
             style={{
               '--col-count': dayCount,
               '--col-width': `${colWidth}px`,
@@ -296,91 +570,20 @@ function CalendarContent() {
               ))}
             </div>
 
-            {filteredRiders.map((rider) => {
-              const entries = rider.calendarEntries || [];
-              const barColor = BAR_COLOR;
-
-              return (
-                <div
-                  key={rider.id}
-                  className="timeline-row timeline-rider timeline-row-bordered"
-                  style={{
-                    gridTemplateRows: '1fr',
-                  }}
-                >
-                  <div className="timeline-label timeline-label-sticky">
-                    <div className="rider-label">
-                      <div className="avatar small">
-                        {rider.photoUrl ? (
-                          <img src={rider.photoUrl} alt={rider.name} />
-                        ) : (
-                          <div className="avatar-fallback">{rider.name?.[0] || '?'}</div>
-                        )}
-                      </div>
-                      <div>
-                        <strong>{rider.name}</strong>
-                        {rider.team ? <div className="muted">{rider.team}</div> : null}
-                      </div>
-                    </div>
-                  </div>
-
-                  {entries.map((entry) => {
-                    const isoDate = toDateKey(entry.date);
-                    const entryDate = new Date(entry.date);
-                    const day = Number(isoDate.slice(8, 10));
-                    const durationDays = getDurationDays(entry);
-                    const duration = Math.min(durationDays, dayCount - day + 1);
-                    const monthIndex = Number(isoDate.slice(5, 7));
-                    const daysInRaceMonth = new Date(
-                      Date.UTC(YEAR, monthIndex, 0)
-                    ).getUTCDate();
-                    const yearWidthPercent = Math.min(
-                      100,
-                      Math.max(10, Math.round((durationDays / daysInRaceMonth) * 100))
-                    );
-                    const gridColumnStart = isYearView ? monthIndex + 1 : day + 1;
-                    const endDate = new Date(entryDate);
-                    endDate.setUTCDate(endDate.getUTCDate() + Math.max(0, durationDays - 1));
-                    const category = categoryForRace(entry);
-                    return (
-                      <TooltipProvider key={entry.id} delayDuration={150}>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div
-                              className="race-bar"
-                              style={{
-                                gridColumn: `${gridColumnStart} / span ${isYearView ? 1 : duration}`,
-                                gridRow: '1',
-                                backgroundColor: barColor,
-                                width: isYearView
-                                  ? `calc(var(--col-width) * ${yearWidthPercent / 100})`
-                                  : 'auto',
-                              }}
-                            >
-                              <span className="race-flag">{flagForRace(entry)}</span>
-                              <span className="race-name">{entry.raceName}</span>
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent side="top" align="center" className="race-tooltip">
-                            <div className="race-title">{entry.raceName}</div>
-                            <div className="race-subtitle">{countryForRace(entry)}</div>
-                            <div className="race-detail">
-                              {formatDateRange(entryDate, endDate)}
-                            </div>
-                            <div className="race-detail">
-                              {durationDays} {durationDays === 1 ? 'day' : 'days'}
-                            </div>
-                            {category ? (
-                              <div className="race-detail">Type: {category}</div>
-                            ) : null}
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    );
-                  })}
-                </div>
-              );
-            })}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={orderedRiders.map((rider) => rider.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {orderedRiders.map((rider) => (
+                  <SortableRiderRow key={rider.id} rider={rider} />
+                ))}
+              </SortableContext>
+            </DndContext>
           </div>
         </div>
       </section>

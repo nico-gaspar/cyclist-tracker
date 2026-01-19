@@ -13,6 +13,8 @@ model Rider {
   name            String
   team            String?
   photoUrl        String?
+  nationality     String?
+  birthDate       DateTime?
   calendarEntries CalendarEntry[]
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt

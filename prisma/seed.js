@@ -14,6 +14,14 @@ const RIDER_FILES = [
   'egan.json',
   'adam.json',
   'sepp.json',
+  // The Rising 5
+  'isaac-del-toro.json',
+  'florian-lipowitz.json',
+  'juan-ayuso.json',
+  'oscar-onley.json',
+  'giulio-pellizzari.json',
+  'matteo-jorgenson.json',
+  'jasper-philipsen.json',
 ];
 
 function toSlug(filename) {
